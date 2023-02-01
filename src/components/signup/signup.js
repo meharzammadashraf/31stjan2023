@@ -2,20 +2,21 @@ import React, {useState} from 'react'
 import axios from 'axios'
 import {useDispatch} from 'react-redux'
 import {Link, Outlet} from 'react-router-dom'
-
-
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import app from '../../firebase/firebase'
 function Signup() {
-
-  const [status, setStatus] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [address, setAddress] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const dispatch = useDispatch()
-  const SignupDone = async (e)=>{
-      e.preventDefault();
+    
+    const [status, setStatus] = useState("");
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [address, setAddress] = useState("");
+    const [phone, setPhone] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const dispatch = useDispatch()
+    const auth = getAuth(app);
+    const SignupDone = async (e)=>{
+        e.preventDefault();
         const post = {
           firstName,
           lastName,
@@ -24,18 +25,25 @@ function Signup() {
           phone,
           password
           };
-          axios.post(
-            `https://dummyjson.com/users/add`,  post )
-                   .then(res => {
-                     console.log(res);
-                     console.log(res.data);
+                     createUserWithEmailAndPassword(auth, post.email, post.password)
+                     .then((userCredential) => {
+                       // Signed in 
+                       const user = userCredential.user;
+                       alert("Account created Successfully!")
+                       // ...
+                     })
+                     .catch((error) => {
+                       const errorCode = error.code;
+                       const errorMessage = error.message;
+                       alert("Error", errorMessage);
+                       // ..
+                     });
                      dispatch({
                       type: 'SIGNUP_DATA',
                       payload: post
                   })
                   setStatus("Account Created!")
-                  window.history.back()
-                 })
+                //   window.history.back()
   }
   return (
     <>

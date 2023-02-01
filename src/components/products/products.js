@@ -18,7 +18,10 @@ function Products() {
             console.log("ccccccccccccc");
     }, [])
     const a = useSelector((state)=>{
-        return state;
+        return state.productreducer;
+    })
+    const cartMnJoData = useSelector((state)=>{
+        return state.cartReducer.data;
     })
     useEffect(() => {
       setAllproducts(a.data)
@@ -26,31 +29,33 @@ function Products() {
       }
     , [a])
     const AddToCart = (data)=>{
-        // var arrayCart = [];
-         
-        let products = [];
-    if(localStorage.getItem('cart')){
-        products = JSON.parse(localStorage.getItem('cart'));
-    }
-    products.push({data});
-    localStorage.setItem('cart', JSON.stringify(products));
+const {id, thumbnail, title, brand, price} = data;
+        // let products = [];
+    // if(cartMnJoData){
+    //     products = cartMnJoData;
+    // }else{
+    //     products.push({id, title, brand, thumbnail, price, quantity: 1});
+    // }
+    console.log("products", data);
+    // products.push({id, title, brand, thumbnail, price, quantity: 1});
+    dispatch({type: 'CART', payload: data})
     }
     
-    const SearchByTitle = (e) => {
-        const searchedData = cat.filter(asdf => {
-            return asdf.title.toLowerCase().includes(e.toLowerCase())
-        })
-        setAllproducts(searchedData);
-    }
-    const Filter = (e) => {
-        const newArray = cat.filter(function (el) {
-            return el.category === e;
-        });
-        setAllproducts(newArray);
-    }
+    // const SearchByTitle = (e) => {
+    //     const searchedData = cat.filter(asdf => {
+    //         return asdf.title.toLowerCase().includes(e.toLowerCase())
+    //     })
+    //     setAllproducts(searchedData);
+    // }
+    // const Filter = (e) => {
+    //     const newArray = cat.filter(function (el) {
+    //         return el.category === e;
+    //     });
+    //     setAllproducts(newArray);
+    // }
     return (
         <>
-            <div className='border  pr-8'>
+            <div className='border  pr-8 pl-8'>
                 <div className='flex'>
                     {/* <div className='w-1/6 bg-blue-200 mr-5 sticky top-20'>
                         <label>Search: <input type="search" className="hover:border-dotted" placeholder='search' value={search} onChange={(e) => { setSearch(e.target.value); SearchByTitle(e.target.value) }} /></label><br />
@@ -78,9 +83,9 @@ function Products() {
                             }
                         </div>
                     </div> */}
-                    <div className='w-5/6 grid grid-cols-3 gap-4'>
+                    <div className=' grid grid-cols-4 gap-4'>
                         {
-                            allproducts.length &&
+                            allproducts?.length &&
                             allproducts.map((data) => {
                                 return (
                                     <div className='border-2 border-red-400 p-4 rounded-lg shadow-sm shadow-slate-500'>

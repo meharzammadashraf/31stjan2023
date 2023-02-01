@@ -1,12 +1,28 @@
 import React, {useState, useEffect} from 'react'
 import { Link, Outlet } from 'react-router-dom'
-
+import { getAuth, signOut } from "firebase/auth";
+import app from '../../firebase/firebase';
+import { useSelector } from 'react-redux';
 
 
 function Layout() {
-  const UrlSave = ()=>{
-    // localStorage.setItem("url", JSON.stringify(window.history.back()))
+  const a = JSON.parse(localStorage.getItem("cart"))
+  // console.log("number of items", a.length);
+  // const loginHuaYaNhi = JSON.parse(localStorage.getItem("loginHogya"));
+  const auth = getAuth(app);
+  const logOut = ()=>{
+signOut(auth).then(() => {
+  localStorage.removeItem("loginHogya")
+  // Sign-out successful.
+}).catch((error) => {
+  // An error happened.
+});
   }
+  const numberOfCartItems = useSelector((state)=>{
+    // console.log(state.cartReducer.data);
+    return state.cartReducer.data;
+})
+
   return (
     <>
     <nav>
@@ -14,9 +30,18 @@ function Layout() {
         <ul className='flex px-10 py-6 text-lg font-medium'>
             <li className='mr-8'><Link to='/'>HOME</Link></li>
             <li className='mr-8'><Link to='/products'>PRODUCTS</Link></li>
-            <li className='mr-8' onClick={UrlSave}><Link to='/login'>LOGIN</Link></li>
-            <li className='mr-8' onClick={UrlSave}><Link to='/signup'>SIGNUP</Link></li>
-            <li><Link to='/cart'>CART</Link></li>
+            {
+              JSON.parse(localStorage.getItem("loginHogya")) ? 
+              <li className='mr-8' onClick={logOut}><Link to="">SIGNOUT</Link></li>
+              :
+              <li className='mr-8'><Link to='/login'>LOGIN</Link></li>
+             }
+            <li className='mr-8'><Link to='/signup'>SIGNUP</Link></li>
+            <li><Link to='/cart'><span class="relative inline-block">
+              CART
+  <span class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">{numberOfCartItems?numberOfCartItems.length:0}</span>
+</span></Link></li>
+            
         </ul>
     </div>
     </nav>

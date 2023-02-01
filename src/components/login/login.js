@@ -1,23 +1,42 @@
 import React, {useState} from 'react'
 import { Link, Outlet } from 'react-router-dom'
 import axios from 'axios';
-
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import app from '../../firebase/firebase'
 function Login() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const auth = getAuth(app);
     const Login = async (e)=>{
         e.preventDefault();
           const post = {
-              username,
+              email,
               password
             };
-            axios.post(
-              `https://dummyjson.com/auth/login`,  post )
-                     .then(res => {
-                       console.log(res);
-                       console.log(res.data);
-                       window.history.back()
-                   })
+
+
+            signInWithEmailAndPassword(auth, email, password)
+.then((userCredential) => {
+    // Signed in 
+    const user = userCredential.user;
+    localStorage.setItem("loginHogya", JSON.stringify(true))
+    window.history.back()
+    // window.location.reload()
+    console.log("login successfully!");
+    // ...
+})
+.catch((error) => {
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    alert("Error:", errorMessage)
+});
+            // axios.post(
+            //   `https://dummyjson.com/auth/login`,  post )
+            //          .then(res => {
+            //            console.log(res);
+            //            console.log(res.data);
+            //            window.history.back()
+            //        })
     }
     return (
     <>
@@ -36,11 +55,10 @@ function Login() {
                         </label>
                         <input
                         id='email'
-                            // type="email"
-                            type='text'
-                            value={username}
+                            type="email"
+                            value={email}
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
-                            onChange={e=>setUsername(e.target.value)}
+                            onChange={e=>setEmail(e.target.value)}
                         />
                     </div>
                     <div className="mb-2">
