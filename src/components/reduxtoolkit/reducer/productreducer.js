@@ -1,7 +1,15 @@
-import { createReducer } from "@reduxjs/toolkit";
-    const initialstate = {}
-export default createReducer(initialstate, (builder)=>{
-    builder.addCase('PRODUCTS', (state, action)=>{
-        state.data = action.payload
-    })
+import { createSlice } from "@reduxjs/toolkit";
+export const productreducer = createSlice({
+    name: "product",
+    initialState: {
+        products: []
+    },
+    reducers:{
+        addProducts: (state, action)=>{
+            state.products.push(action.payload)
+        }
+    },
 })
+
+export const {addProducts} = productreducer.actions
+export default productreducer.reducer

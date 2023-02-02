@@ -1,76 +1,162 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { deleteCart } from '../reduxtoolkit/reducer/cartReducer'
+import { addCart, reduceCart } from '../reduxtoolkit/reducer/cartReducer'
+
+
+import { loadStripe } from '@stripe/stripe-js';
+import CheckoutForm from './checkoutform'
+import { Elements } from '@stripe/react-stripe-js';
+import SuccessMessage from './scccessmessage'
+const stripePromise = loadStripe("pk_test_51MQtBjJU8efuyOseP0AMcbtc5i0XBi8ExHGJYYpwNz9DaVCNGeZBerjyIXXAH3cfFz2fkms3XmlmLouQOYSO5V5M00nxJTYhkr");
+
 
 function Cart() {
   // const savedCart = JSON.parse(localStorage.getItem("cart"))
-  const a = useSelector((state)=>{
-    // console.log(state.cartReducer.data);
-    return state.cartReducer.data;
-})
+  const dispatch = useDispatch();
+  const [showModal, setShowModal] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const total = [];
+  const a = useSelector((state) => {
+    console.log("cart state", state.cartReducer.cartItems);
+    return state.cartReducer.cartItems;
+  })
   return (
     <>
-    {
-      a ?
-      <div class="container mx-auto mt-10">
-      <div class=" shadow-md my-10">
-        <div class=" bg-white px-10 py-10">
-          <div class="flex justify-between border-b pb-8">
-            <h1 class="font-semibold text-2xl">Shopping Cart</h1>
-            <h2 class="font-semibold text-2xl">No. of Item: {a.length}</h2>
-          </div>
-          <div class="flex mt-10 mb-5">
-            <h3 class="font-semibold text-gray-600 text-xs uppercase w-2/5">Product Details</h3>
-            <h3 class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5">Quantity</h3>
-            <h3 class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5">Price</h3>
-            <h3 class="font-semibold text-center text-gray-600 text-xs uppercase w-1/5">Total</h3>
-          </div>
-          {
-            a.map((data)=>{ 
-              console.log(data);
-              return(
-              
-              <>
-                <div class="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5">
-            <div class="flex w-2/5"> 
-              <div class="w-20">
-                <img class="h-24" src={data.thumbnail} alt="" />
-              </div>
-              <div class="flex flex-col justify-between ml-4 flex-grow">
-                <span class="font-bold text-sm">{data.title}</span>
-                <span class="text-red-500 text-xs">{data.brand}</span>
-                <a href="#" class="font-semibold hover:text-red-500 text-gray-500 text-xs">Remove</a>
+      {
+        a ?
+          <div className="container mx-auto mt-10">
+            <div className=" shadow-md my-10">
+              <div className=" bg-white px-10 py-10">
+                <div className="flex justify-between border-b pb-8">
+                  <h1 className="font-semibold text-2xl">Shopping Cart</h1>
+                  <h2 className="font-semibold text-2xl">No. of Item: {a.length}</h2>
+                </div>
+                <div className="flex mt-10 mb-5">
+                  <h3 className="font-semibold text-gray-600 text-xs uppercase w-2/5">Product Details</h3>
+                  <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/5">Quantity</h3>
+                  <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/5">Price</h3>
+                  <h3 className="font-semibold text-center text-gray-600 text-xs uppercase w-1/5">Total</h3>
+                </div>
+                {
+                  a.map((data) => {
+                    console.log(data.quantity);
+                    total.push(parseInt(data.price * data.quantity))
+                    return (
+
+                      <>
+                        <div className="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5">
+                          <div className="flex w-2/5">
+                            <div className="w-20">
+                              <img className="h-24" src={data.thumbnail} alt="" />
+                            </div>
+                            <div className="flex flex-col justify-between ml-4 flex-grow">
+                              <span className="font-bold text-sm">{data.title}</span>
+                              <span className="text-red-500 text-xs">{data.brand}</span>
+                              <a className="cursor-pointer font-semibold hover:text-red-500 text-gray-500 text-xs" onClick={() => dispatch(deleteCart({ id: data.id }))}>Remove</a>
+                            </div>
+                          </div>
+                          <div className="flex justify-center w-1/5">
+                            <svg className="fill-current text-gray-600 w-3" viewBox="0 0 448 512" onClick={() => dispatch(reduceCart(data))}>
+                              <path d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+                            </svg>
+
+                            <input className="mx-2 border text-center w-8" type="text" value={data.quantity} />
+
+                            <svg className="cursor-pointer fill-current text-gray-600 w-3" viewBox="0 0 448 512" onClick={() => dispatch(addCart(data))}>
+                              <path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" />
+                            </svg>
+                          </div>
+                          <span className="text-center w-1/5 font-semibold text-sm">${data.price}</span>
+                          <span className="text-center w-1/5 font-semibold text-sm">${data.quantity * data.price}</span>
+                        </div>
+                      </>)
+                  })
+                }
+                {
+                  total.length &&
+                  <div className="flex justify-end pb-4">
+                    <h1 className="font-semibold text-2xl">Total: </h1>
+                    <h2 className="font-bold text-2xl">{total.reduce((a, b) => a + b, 0)}</h2>
+                  </div>
+                }
+                {
+                  total.length &&
+                  <div className='text-center bg-blue-400 pt-2 pb-2 rounded-md'>
+                    <button onClick={() => { setShowModal(true) }}>PAY NOW</button>
+                  </div>
+                }
+                <Link to="/products" className="flex font-semibold text-indigo-600 text-sm mt-10">
+                  <svg className="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512"><path d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" /></svg>
+                  Continue Shopping
+                </Link>
               </div>
             </div>
-            <div class="flex justify-center w-1/5">
-              <svg class="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
-                <path d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/>
-              </svg>
-  
-              <input class="mx-2 border text-center w-8" type="text" value="1" />
-  
-              <svg class="fill-current text-gray-600 w-3" viewBox="0 0 448 512">
-                <path d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"/>
-              </svg>
-            </div>
-            <span class="text-center w-1/5 font-semibold text-sm">${data.price}</span>
-            <span class="text-center w-1/5 font-semibold text-sm">$400.00</span>
           </div>
-              </>)
-            })
-          }
-          <Link to="/products" class="flex font-semibold text-indigo-600 text-sm mt-10">
-            <svg class="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512"><path d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z"/></svg>
-            Continue Shopping
-          </Link>
-        </div>
-      </div>
-    </div>
-    : <p></p>
-    }
-       
+          : <p></p>
+      }
+      {showModal ? (
+        // <form>
+        <>
+          <div
+            className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none"
+          >
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
+                  <h3 className=" text-3xl font-semibold">
+                    Pay with card
+                  </h3>
+                  <button
+                    className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                    onClick={() => setShowModal(false)}
+                  >
+                    <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                      ×
+                    </span>
+                  </button>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex-auto">
+                  {
+                    paymentCompleted ? <SuccessMessage /> :
+                      <Elements stripe={stripePromise}>
+                        <CheckoutForm amount={total.reduce((a, b) => a + b, 0)} setPaymentCompleted={setPaymentCompleted} />
+                      </Elements>
+                  }
+                </div>
+                {/*footer*/}
+                <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+
+                  <button
+                    className="text-red-500 background-transparent font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => { setShowModal(false) }}
+                  >
+                    Close
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
     </>
   )
 }
 
 export default Cart
+
+
+
+
+
+
+
+
+
