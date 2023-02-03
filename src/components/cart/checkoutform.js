@@ -30,9 +30,35 @@ const CheckoutForm = (props)=> {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [validation, setValidation] = useState('');
 
   const stripe = useStripe();
   const elements = useElements();
+
+
+
+
+//   const Modal1 = (e)=>{
+//     e.preventDefault();
+//     if (name && email) {
+//       handleSubmit()
+   
+//   } else {
+//     if (!name) {
+//       document.getElementById("name").classList.remove("hidden")
+//     }else if(!email){
+//       document.getElementById("email").classList.remove("hidden")
+//       document.getElementById("name").classList.add("hidden")
+//     }else{
+//       document.getElementById("email").classList.add("hidden")
+//     }
+//     }
+// }
+
+
+
+
+
     const handleSubmit = async (event) => {
       // We don't want to let default form submission happen here,
       // which would refresh the page.
@@ -79,22 +105,25 @@ const CheckoutForm = (props)=> {
         <div className="row">
           <div className="">
             <label htmlFor="name">Name on card:</label>
+            {/* <span id='name' className="hidden p-2 text-xs text-red-600">Please fill the name field!</span> */}
             <input
               id="name"
               type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="border-2 border-slate-300 rounded w-full py-2 px-3 text-gray-700 leading-tight"
               value={name}
               onChange={e => setName(e.target.value)}
-            />
-          </div>
+              required
+            /></div>
           <div className="">
             <label htmlFor="email">Email</label>
+            {/* <span id='email' className="hidden p-2 text-xs text-red-600">Please fill the email field!</span> */}
             <input
               id="email"
-              type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              type="email"
+              className="border-2 border-slate-300 rounded w-full py-2 px-3 text-gray-700 leading-tight"
               value={email}
               onChange={e => setEmail(e.target.value)}
+              required
             />
           </div>
         </div>
@@ -104,7 +133,7 @@ const CheckoutForm = (props)=> {
             <label htmlFor="number">Card Number</label>
             <CardNumberElement
               id="number"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="border-2 border-slate-300 rounded w-full py-2 px-3 text-gray-700 leading-tight"
               options={CARD_ELEMENT_OPTIONS}
             />
           </div>
@@ -115,7 +144,7 @@ const CheckoutForm = (props)=> {
             <label htmlFor="expiry">Expiration Date</label>
             <CardExpiryElement
               id="expiry"
-              className="form-control"
+              className="border-2 border-slate-300 rounded w-full py-2 px-3 text-gray-700 leading-tight"
               options={CARD_ELEMENT_OPTIONS}
             />
           </div>
@@ -123,7 +152,7 @@ const CheckoutForm = (props)=> {
             <label htmlFor="cvc">CVC</label>
             <CardCvcElement
               id="cvc"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="border-2 border-slate-300 rounded w-full py-2 px-3 text-gray-700 leading-tight"
               options={CARD_ELEMENT_OPTIONS}
             />
           </div>

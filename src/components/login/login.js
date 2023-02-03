@@ -1,12 +1,19 @@
 import React, {useState} from 'react'
-import { Link, Outlet } from 'react-router-dom'
-import axios from 'axios';
+import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import app from '../../firebase/firebase'
+import { useDispatch, useSelector } from 'react-redux';
+import { addIsuser } from '../reduxtoolkit/reducer/isuserReducer';
 function Login() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errormsg, setErrormsg] = useState("");
     const auth = getAuth(app);
+    // console.log(window.history.previous.href());
+    const konsaPage = useSelector(store => store.pageNoReducer.pageNo)
+    console.log("page No: ", konsaPage);
     const Login = async (e)=>{
         e.preventDefault();
           const post = {
@@ -19,16 +26,32 @@ function Login() {
 .then((userCredential) => {
     // Signed in 
     const user = userCredential.user;
-    localStorage.setItem("loginHogya", JSON.stringify(true))
-    window.history.back()
-    // window.location.reload()
+    dispatch(addIsuser({login: true}))
+    
+    setErrormsg("")
     console.log("login successfully!");
+    if (konsaPage === 1) {
+        console.log("home");
+        navigate("/")
+    } else if(konsaPage === 2){
+        navigate("/products")
+        console.log("product");
+    }
+    else if(konsaPage === 3){
+        navigate("/cart")
+        console.log("cart");
+    }else{
+        navigate("/")
+    }
     // ...
 })
 .catch((error) => {
     const errorCode = error.code;
     const errorMessage = error.message;
-    alert("Error:", errorMessage)
+    setErrormsg("invalid email or password")
+    console.log(errorMessage);
+
+    
 });
             // axios.post(
             //   `https://dummyjson.com/auth/login`,  post )
@@ -82,6 +105,7 @@ function Login() {
                     >
                         Forget Password?
                     </Link>
+                    {errormsg}
                     <div className="mt-6">
                         <input type='submit' className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-blue-500 rounded-md hover:bg-blue-400 focus:outline-none focus:bg-blue-600"
                             value="Login"

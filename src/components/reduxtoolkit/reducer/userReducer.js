@@ -1,7 +1,15 @@
-import { createReducer } from "@reduxjs/toolkit";
-    const initialstate = {}
-export default createReducer(initialstate, (builder)=>{
-    builder.addCase('USER', (state, action)=>{
-        state.data = action.payload
-    })
+import { createSlice } from "@reduxjs/toolkit";
+export const userreducer = createSlice({
+    name: "user",
+    initialState: {
+        users: []
+    },
+    reducers:{
+        addUser: (state, action)=>{
+            state.users.push(action.payload)
+        }
+    },
 })
+
+export const {addUser} = userreducer.actions
+export default userreducer.reducer

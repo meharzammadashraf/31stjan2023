@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const SuccessMessage = () => {
+  
     return (
       <div className="success-msg">
         <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-check2" fill="currentColor" xmlns="http://www.w3.org/2000/svg">

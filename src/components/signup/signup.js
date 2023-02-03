@@ -1,9 +1,11 @@
 import React, {useState} from 'react'
 import axios from 'axios'
 import {useDispatch} from 'react-redux'
-import {Link, Outlet} from 'react-router-dom'
+import {Link, Outlet, useNavigate} from 'react-router-dom'
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import app from '../../firebase/firebase'
+import { addUser } from '../reduxtoolkit/reducer/userReducer';
+import { addpageNo } from '../reduxtoolkit/reducer/pageNoReducer';
 function Signup() {
     
     const [status, setStatus] = useState("");
@@ -13,8 +15,10 @@ function Signup() {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const navigate = useNavigate();
     const dispatch = useDispatch()
     const auth = getAuth(app);
+    dispatch(addpageNo(0))
     const SignupDone = async (e)=>{
         e.preventDefault();
         const post = {
@@ -29,7 +33,7 @@ function Signup() {
                      .then((userCredential) => {
                        // Signed in 
                        const user = userCredential.user;
-                       alert("Account created Successfully!")
+                       navigate("/login")
                        // ...
                      })
                      .catch((error) => {
@@ -38,10 +42,7 @@ function Signup() {
                        alert("Error", errorMessage);
                        // ..
                      });
-                     dispatch({
-                      type: 'SIGNUP_DATA',
-                      payload: post
-                  })
+                     dispatch(addUser(post))
                   setStatus("Account Created!")
                 //   window.history.back()
   }
@@ -66,6 +67,7 @@ function Signup() {
                             value={firstName}
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             onChange={e=>setFirstName(e.target.value)}
+                            required
                         />
                     </div>
                     <div className="mb-2">
@@ -78,6 +80,7 @@ function Signup() {
                         <input
                         id='lastname'
                             type="text"
+                            required
                             value={lastName}
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             onChange={e=>setLastName(e.target.value)}
@@ -93,6 +96,7 @@ function Signup() {
                         <input
                         id='phone'
                             type="number"
+                            required
                             value={phone}
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             onChange={e=>setPhone(e.target.value)}
@@ -108,6 +112,7 @@ function Signup() {
                         <input
                         id='address'
                             type="text"
+                            required
                             value={address}
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             onChange={e=>setAddress(e.target.value)}
@@ -123,6 +128,7 @@ function Signup() {
                         <input
                         id='email'
                             type="email"
+                            required
                             value={email}
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             onChange={e=>setEmail(e.target.value)}
@@ -138,6 +144,7 @@ function Signup() {
                         <input
                         id='password'
                         value={password}
+                        required
                             type="password"
                             className="block w-full px-4 py-2 mt-2 text-blue-700 bg-white border rounded-md border-blue-300 focus:border-blue-500 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
                             onChange={(e)=>setPassword(e.target.value)}

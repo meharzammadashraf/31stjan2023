@@ -1,27 +1,30 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { deleteCart } from '../reduxtoolkit/reducer/cartReducer'
 import { addCart, reduceCart } from '../reduxtoolkit/reducer/cartReducer'
+import { addpageNo } from '../reduxtoolkit/reducer/pageNoReducer'
 
 
 import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from './checkoutform'
 import { Elements } from '@stripe/react-stripe-js';
 import SuccessMessage from './scccessmessage'
+import Login from '../login/login'
 const stripePromise = loadStripe("pk_test_51MQtBjJU8efuyOseP0AMcbtc5i0XBi8ExHGJYYpwNz9DaVCNGeZBerjyIXXAH3cfFz2fkms3XmlmLouQOYSO5V5M00nxJTYhkr");
 
 
 function Cart() {
-  // const savedCart = JSON.parse(localStorage.getItem("cart"))
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const total = [];
+  dispatch(addpageNo(3))
   const a = useSelector((state) => {
-    console.log("cart state", state.cartReducer.cartItems);
     return state.cartReducer.cartItems;
   })
+const loginhayani = useSelector(state => state.isuserReducer.isusers);
   return (
     <>
       {
@@ -41,12 +44,11 @@ function Cart() {
                 </div>
                 {
                   a.map((data) => {
-                    console.log(data.quantity);
                     total.push(parseInt(data.price * data.quantity))
                     return (
 
                       <>
-                        <div className="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5">
+                        <div key={data.id} className="flex items-center hover:bg-gray-100 -mx-8 px-6 py-5">
                           <div className="flex w-2/5">
                             <div className="w-20">
                               <img className="h-24" src={data.thumbnail} alt="" />
@@ -75,17 +77,25 @@ function Cart() {
                   })
                 }
                 {
-                  total.length &&
+                  total.length ?
                   <div className="flex justify-end pb-4">
                     <h1 className="font-semibold text-2xl">Total: </h1>
                     <h2 className="font-bold text-2xl">{total.reduce((a, b) => a + b, 0)}</h2>
-                  </div>
+                  </div>:
+                  ""
                 }
                 {
-                  total.length &&
-                  <div className='text-center bg-blue-400 pt-2 pb-2 rounded-md'>
-                    <button onClick={() => { setShowModal(true) }}>PAY NOW</button>
-                  </div>
+                  total.length ?
+                  <div onClick={() => { 
+                    loginhayani.length ?
+                    setShowModal(true)
+                  :
+                  navigate("/login")
+                  // window.location.pathname = '/login'
+                }} className='text-center bg-blue-400 pt-2 pb-2 rounded-md'>
+                    <button>PAY NOW</button>
+                  </div>:
+                  ""
                 }
                 <Link to="/products" className="flex font-semibold text-indigo-600 text-sm mt-10">
                   <svg className="fill-current mr-2 text-indigo-600 w-4" viewBox="0 0 448 512"><path d="M134.059 296H436c6.627 0 12-5.373 12-12v-56c0-6.627-5.373-12-12-12H134.059v-46.059c0-21.382-25.851-32.09-40.971-16.971L7.029 239.029c-9.373 9.373-9.373 24.569 0 33.941l86.059 86.059c15.119 15.119 40.971 4.411 40.971-16.971V296z" /></svg>
@@ -111,10 +121,10 @@ function Cart() {
                     Pay with card
                   </h3>
                   <button
-                    className="p-1 ml-auto bg-transparent border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+                    className="p-1 ml-auto bg-red-400 border-0 text-black opacity-5 float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
                     onClick={() => setShowModal(false)}
                   >
-                    <span className="bg-transparent text-black opacity-5 h-6 w-6 text-2xl block outline-none focus:outline-none">
+                    <span className="bg-red-500 text-black opacity-5 h-6 w-6 text-2xl block  focus:outline-none">
                       ×
                     </span>
                   </button>
@@ -124,7 +134,7 @@ function Cart() {
                   {
                     paymentCompleted ? <SuccessMessage /> :
                       <Elements stripe={stripePromise}>
-                        <CheckoutForm amount={total.reduce((a, b) => a + b, 0)} setPaymentCompleted={setPaymentCompleted} />
+                        <CheckoutForm amount={total.reduce((a, b) => a + b, 0)} setShowModal={setShowModal} setPaymentCompleted={setPaymentCompleted} />
                       </Elements>
                   }
                 </div>
@@ -134,7 +144,15 @@ function Cart() {
                   <button
                     className="text-red-500 background-transparent font-bold uppercase px-2 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
-                    onClick={() => { setShowModal(false) }}
+                    onClick={() => { 
+                      if(paymentCompleted){
+                        setShowModal(false)
+                        window.location.reload()
+
+                    }else{
+                      setShowModal(false)
+                    }
+                     }}
                   >
                     Close
                   </button>
