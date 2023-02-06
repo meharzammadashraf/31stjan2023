@@ -4,14 +4,11 @@ import { getAuth, signOut } from "firebase/auth";
 import app from '../../firebase/firebase';
 import { useSelector, useDispatch } from 'react-redux';
 import { addIsuser, deleteIsuser } from '../reduxtoolkit/reducer/isuserReducer';
+import Footer from '../footer/footer';
 
 
 function Layout() {
-  const dispatch = useDispatch();
-  // useEffect(() => {
-  //   dispatch(addIsuser({login:}))
-  // }, [third])
-  
+  const dispatch = useDispatch();  
   const koiloginhua = useSelector(state => state.isuserReducer.isusers)
   console.log("isLogin", koiloginhua);
   const auth = getAuth(app);
@@ -51,7 +48,8 @@ function Layout() {
           </ul>
         </div>
       </nav>
-      <Outlet />
+      <Outlet />      
+      <Footer />
     </>
   )
 }
